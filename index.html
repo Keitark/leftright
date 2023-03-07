@@ -1,50 +1,81 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Left Right Game</title>
+    <meta charset="utf-8">
+    <title>右か左かをタップ</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        font-size: 48px;
+        font-weight: bold;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .message {
+        margin-top: -100px;
+      }
+      .score {
+        margin-top: 50px;
+        font-size: 24px;
+        font-weight: normal;
+      }
+    </style>
   </head>
   <body>
-    <h1>Left Right Game</h1>
-    <p>Click on the button that corresponds to the direction shown.</p>
-    <button id="left" onclick="checkAnswer('left')">LEFT</button>
-    <button id="right" onclick="checkAnswer('right')">RIGHT</button>
-    <p>Score: <span id="score">0</span></p>
+    <div class="message"></div>
+    <div class="score">スコア: <span id="score">0</span></div>
     <script>
       let score = 0;
       let timer;
-      let correct;
-
+      
       function startGame() {
-        score = 0;
-        document.querySelector("#score").textContent = score;
-        startRound();
-      }
-
-      function startRound() {
-        const directions = ["left", "right"];
-        correct = directions[Math.floor(Math.random() * 2)];
-        document.querySelector("#" + correct).textContent = "CENTER";
         timer = setTimeout(function() {
           endGame(false);
         }, 1000);
+        
+        let message = document.querySelector(".message");
+        let side = Math.random() < 0.5 ? "左" : "右";
+        message.textContent = side;
+        message.style.color = "white";
+        message.style.backgroundColor = "black";
+        
+        document.body.addEventListener("click", function(event) {
+          clearTimeout(timer);
+          let selectedSide = event.clientX < window.innerWidth / 2 ? "左" : "右";
+          if (selectedSide === side) {
+            endGame(true);
+          } else {
+            endGame(false);
+          }
+        }, { once: true });
       }
-
-      function endGame(timeout) {
-        clearTimeout(timer);
-        document.querySelector("#" + correct).textContent = correct.toUpperCase();
-        alert("Game over! " + (timeout ? "Time's up!" : "Wrong answer!"));
-      }
-
-      function checkAnswer(answer) {
-        clearTimeout(timer);
-        if (answer === correct) {
+      
+      function endGame(win) {
+        let message = document.querySelector(".message");
+        message.textContent = win ? "正解！" : "残念！";
+        message.style.color = win ? "green" : "red";
+        message.style.backgroundColor = "white";
+        
+        if (win) {
           score++;
           document.querySelector("#score").textContent = score;
         }
-        setTimeout(startRound, 1000);
+        
+        if (score === 20) {
+          clearInterval(interval);
+          message.textContent = "ゲーム終了！";
+          message.style.color = "white";
+          message.style.backgroundColor = "black";
+        } else {
+          setTimeout(startGame, 1000);
+        }
       }
-
-      startGame();
+      
+      let interval = setInterval(startGame, 1000);
     </script>
   </body>
 </html>
