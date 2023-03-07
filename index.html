@@ -1,56 +1,91 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Left Right Game</title>
-  </head>
-  <body>
-    <h1>Left Right Game</h1>
-    <p>Click on the button that corresponds to the direction shown.</p>
-    <button id="left" onclick="checkAnswer('left')" disabled>LEFT</button>
-    <button id="right" onclick="checkAnswer('right')" disabled>RIGHT</button>
-    <p>Score: <span id="score">0</span></p>
-    <script>
-      let score = 0;
-      let timer;
-      let correct;
+<head>
+	<meta charset="utf-8">
+	<title>左右ゲーム</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			text-align: center;
+		}
 
-      function startGame() {
-        score = 0;
-        document.querySelector("#score").textContent = score;
-        startRound();
-      }
+		h1 {
+			margin-top: 50px;
+		}
 
-      function startRound() {
-        document.querySelector("#left").disabled = false; // 左ボタンを有効化
-        document.querySelector("#right").disabled = false; // 右ボタンを有効化
-        const directions = ["left", "right"];
-        correct = directions[Math.floor(Math.random() * 2)];
-        document.querySelector("#" + correct).textContent = "CENTER";
-        timer = setTimeout(function() {
-          endGame(false);
-        }, 1000);
-      }
+		button {
+			margin-top: 30px;
+			padding: 10px 20px;
+			font-size: 20px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
 
-      function endGame(timeout) {
-        clearTimeout(timer);
-        document.querySelector("#" + correct).textContent = correct.toUpperCase();
-        document.querySelector("#left").disabled = true; // 左ボタンを無効化
-        document.querySelector("#right").disabled = true; // 右ボタンを無効化
-        alert("Game over! " + (timeout ? "Time's up!" : "Wrong answer!"));
-      }
+		button:hover {
+			background-color: #3e8e41;
+		}
 
-      function checkAnswer(answer) {
-        clearTimeout(timer);
-        if (answer === correct) {
-          score++;
-          document.querySelector("#score").textContent = score;
-        }
-        document.querySelector("#left").disabled = true; // 左ボタンを無効化
-        document.querySelector("#right").disabled = true; // 右ボタンを無効化
-        setTimeout(startRound, 1000);
-      }
+		#score {
+			margin-top: 30px;
+			font-size: 24px;
+		}
+	</style>
+</head>
+<body>
+	<h1>左右ゲーム</h1>
+	<p>画面の右半分か左半分かをタップしてください</p>
+	<button id="start-button">スタート</button>
+	<div id="answer-container"></div>
+	<div id="score">スコア: 0</div>
 
-      startGame();
-    </script>
-  </body>
+	<script>
+		const startButton = document.getElementById("start-button");
+		const answerContainer = document.getElementById("answer-container");
+		const scoreDisplay = document.getElementById("score");
+		let score = 0;
+		let count = 0;
+
+		function displayAnswer() {
+			const answer = Math.random() < 0.5 ? "左" : "右";
+			answerContainer.innerText = answer;
+			setTimeout(checkAnswer, 1000, answer);
+		}
+
+		function checkAnswer(correctAnswer) {
+			if (document.body.clientWidth / 2 < event.clientX) {
+				if (correctAnswer === "右") {
+					score++;
+				}
+			} else {
+				if (correctAnswer === "左") {
+					score++;
+				}
+			}
+			count++;
+			scoreDisplay.innerText = `スコア: ${score}`;
+			if (count < 20) {
+				displayAnswer();
+			} else {
+				answerContainer.innerText = "";
+				startButton.innerText = "もう一度遊ぶ";
+				startButton.addEventListener("click", resetGame);
+			}
+		}
+
+		function resetGame() {
+			score = 0;
+			count = 0;
+			scoreDisplay.innerText = `スコア: ${score}`;
+			startButton.innerText = "スタート";
+			startButton.removeEventListener("click", resetGame);
+			answerContainer.innerText = "";
+			startButton.addEventListener("click", displayAnswer);
+		}
+
+		startButton.addEventListener("click", displayAnswer);
+	</script>
+</body>
 </html>
