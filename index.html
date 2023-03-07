@@ -1,91 +1,50 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>左右ゲーム</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			text-align: center;
-		}
+  <head>
+    <title>Left Right Game</title>
+  </head>
+  <body>
+    <h1>Left Right Game</h1>
+    <p>Click on the button that corresponds to the direction shown.</p>
+    <button id="left" onclick="checkAnswer('left')">LEFT</button>
+    <button id="right" onclick="checkAnswer('right')">RIGHT</button>
+    <p>Score: <span id="score">0</span></p>
+    <script>
+      let score = 0;
+      let timer;
+      let correct;
 
-		h1 {
-			margin-top: 50px;
-		}
+      function startGame() {
+        score = 0;
+        document.querySelector("#score").textContent = score;
+        startRound();
+      }
 
-		button {
-			margin-top: 30px;
-			padding: 10px 20px;
-			font-size: 20px;
-			background-color: #4CAF50;
-			color: white;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
+      function startRound() {
+        const directions = ["left", "right"];
+        correct = directions[Math.floor(Math.random() * 2)];
+        document.querySelector("#" + correct).textContent = "CENTER";
+        timer = setTimeout(function() {
+          endGame(false);
+        }, 1000);
+      }
 
-		button:hover {
-			background-color: #3e8e41;
-		}
+      function endGame(timeout) {
+        clearTimeout(timer);
+        document.querySelector("#" + correct).textContent = correct.toUpperCase();
+        alert("Game over! " + (timeout ? "Time's up!" : "Wrong answer!"));
+      }
 
-		#score {
-			margin-top: 30px;
-			font-size: 24px;
-		}
-	</style>
-</head>
-<body>
-	<h1>左右ゲーム</h1>
-	<p>画面の右半分か左半分かをタップしてください</p>
-	<button id="start-button">スタート</button>
-	<div id="answer-container"></div>
-	<div id="score">スコア: 0</div>
+      function checkAnswer(answer) {
+        clearTimeout(timer);
+        if (answer === correct) {
+          score++;
+          document.querySelector("#score").textContent = score;
+        }
+        setTimeout(startRound, 1000);
+      }
 
-	<script>
-		const startButton = document.getElementById("start-button");
-		const answerContainer = document.getElementById("answer-container");
-		const scoreDisplay = document.getElementById("score");
-		let score = 0;
-		let count = 0;
-
-		function displayAnswer() {
-			const answer = Math.random() < 0.5 ? "左" : "右";
-			answerContainer.innerText = answer;
-			setTimeout(checkAnswer, 1000, answer);
-		}
-
-		function checkAnswer(correctAnswer) {
-			if (document.body.clientWidth / 2 < event.clientX) {
-				if (correctAnswer === "右") {
-					score++;
-				}
-			} else {
-				if (correctAnswer === "左") {
-					score++;
-				}
-			}
-			count++;
-			scoreDisplay.innerText = `スコア: ${score}`;
-			if (count < 20) {
-				displayAnswer();
-			} else {
-				answerContainer.innerText = "";
-				startButton.innerText = "もう一度遊ぶ";
-				startButton.addEventListener("click", resetGame);
-			}
-		}
-
-		function resetGame() {
-			score = 0;
-			count = 0;
-			scoreDisplay.innerText = `スコア: ${score}`;
-			startButton.innerText = "スタート";
-			startButton.removeEventListener("click", resetGame);
-			answerContainer.innerText = "";
-			startButton.addEventListener("click", displayAnswer);
-		}
-
-		startButton.addEventListener("click", displayAnswer);
-	</script>
-</body>
+      startGame();
+    </script>
+  </body>
 </html>
